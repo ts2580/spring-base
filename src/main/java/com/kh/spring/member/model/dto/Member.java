@@ -5,13 +5,13 @@ import java.sql.Date;
 public class Member {
 	
 	private String userId;
-	   private String password;
-	   private String email;
-	   private String grade;
-	   private String tell;
-	   private Date rentableDate;
-	   private Date regDate;
-	   private int isLeave;
+	private String password;
+	private String email;
+	private String grade;
+	private String tell;
+	private Date rentableDate;
+	private Date regDate;
+	private int isLeave;
 	   
 	   public String getUserId() {
 	      return userId;

@@ -3,7 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="com.kh.spring.mybatis.mybatisMapper">
+<mapper namespace="com.kh.spring.mybatis.MybatisRepository">
 
 	<!-- 파라미터 선언 -->
 	<!-- #{ } vs${ } -->
@@ -11,18 +11,6 @@
 	<!-- ${ }쿼리 템플릿이 생성되는 시점에 파라미터값을 전달받아 쿼리템플릿을 완성. 문자열 이스케이프처리 안됨. -> SQL injection 공격에 취약-->
 
 
-	
-	<select id="selectPasswordByUserId" resultType="String">
-		select password from member WHERE user_id = #{userId}
-	</select>
-	
-	<select id="selectMemberByUserId" resultType="Member">
-		select * from member WHERE user_id = #{userId}
-	</select>
-	
-	<select id="selectRentAndMenberByUserId" resultType="map">
-		select * from member inner join rent_master using(user_id) WHERE user_id = #{userId}
-	</select>
 	
 	<resultMap id="rentData" type="map">
 		<!--
@@ -41,49 +29,6 @@
 	<select id="selectRentBookByUserId" resultMap="rentData">
 		select user_id, rm_idx, rb_idx, rent_book_cnt, bk_idx, rentable_date from member inner join rent_master using(user_id) inner join rent_book using(rm_idx) where user_id = #{userId}
 	</select>
-	
-	<insert id="insertWithDto">
-		insert into member(user_id, password, tell, email) values(#{userId},#{password},#{tell},#{email})
-	</insert>
-	
-	<insert id="insertWithMap">
-		insert into rent_master(rm_idx, user_id, title, rent_book_cnt) values(sc_rm_idx.nextval,#{member.userId},#{title},#{rentBookCnt})
-	</insert>
-	
-	<insert id="delete">
-		delete rent_master where title = #{userId}
-	</insert>
-	
-	<update id="update">
-		update member set password = #{password} where user_id = #{userId}
-	</update>
-	
-	
-	<!-- mybatis의 기본 statement 객체는 PreparedStatement이다 -->
-	<!-- statementType 속성을 사용해 변경 가능 -->
-	<!-- statement, prepared, callable 사용가능 -->
-	<update id="procedure" statementType="CALLABLE">
-		{call SP_RENT_EXTENTED(#{rbIdx, mode=IN})
-	</update>
-	
-	<insert id="test01">
-		insert into book(title, author, bk_idx) values(#{title},#{author},SC_BK_IDX.nextval)
-	</insert>
-	
-	<update id="test02">
-		update rent_book set EXTENSION_CNT = 0 where EXTENSION_CNT >= #{cnt}
-	</update>
-	
-	<delete id="test03">
-		delete member where REG_DATE &lt;= #{regDate2} and REG_DATE >= #{regDate}
-	</delete>
-	
-	<select id="test04" resultType="map"> 
-		select title from(select title from book order by rent_cnt desc) WHERE rownum &lt;= #{cnt}
-		<!-- select * from(select b.* from book b order by rent_cnt desc) WHERE rownum &lt; 4 -->
-		<!-- q별칭 붙이는 이유 : * 붙일떄 별칭 없으면 안들어먹음 -->
-	</select>
-	
 	
 	<select id="dynamicIf" resultType="map">
 		select * from book where

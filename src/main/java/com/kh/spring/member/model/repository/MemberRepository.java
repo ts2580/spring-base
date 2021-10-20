@@ -1,18 +1,24 @@
 package com.kh.spring.member.model.repository;
 
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
-@Repository
-public class MemberRepository {
-	
-	@Autowired
-	private SqlSessionTemplate session;
-	
-	public String selectPasswordByUserId(String userId) {
-		return session.selectOne("com.kh.spring.mybatis.mybatisMapper.selectPasswordByUserId", userId);
-		
-	}
+import com.kh.spring.member.model.dto.Member;
+import com.kh.spring.member.validator.JoinForm;
 
+@Mapper
+public interface MemberRepository {
+	
+	@Insert("insert into member(user_id, password, email, tell) values(#{userId}, #{password}, #{email}, #{tell})")
+	void insertMember(JoinForm form);
+	
+	@Select("select * from member where user_id = #{userId} and password = #{password}")
+	Member authrnticationUser(Member member);
+	
+	@Select("select * from member where user_id = #{userId}")
+	Member selectMemberByUserId(String userId);
+
+
+	
 }

@@ -45,10 +45,17 @@ input[type=submit]{
         <tr>
            <td>ID : </td>
            <td >
-                <input type="text" name="userId" id="userId" size="10" required />
-                <!-- joinForm에서 실패했을시 값을 담는 joinFailed에 값이 없다면 정상진행-->
+                <input type="text" name="userId" id="userId" size="10" 
+               		<c:if test="${empty error.userId}">
+                    	value="${joinForm.userId}"   
+                	</c:if>
+                required />
+                <!-- error에 값이 없다면 정상진행-->
                 
                 <button type="button" id="btnIdCheck">check</button>
+                <c:if test="${empty error.userId}">
+                    	<span id="idCheck" class="valid-msg"></span>
+                </c:if>
                 <form:errors path="userId" cssClass="valid-msg"/>
                 <!-- userId가 validator 통과 못하면 span태그 만들어서 미리 지정한 valid-msg 출력 -->
            </td>
@@ -56,14 +63,22 @@ input[type=submit]{
         <tr>
            <td>PASSWORD : </td>
            <td>
-                <input type="password" name="password" id="password" placeholder="영어,숫자,특수문자 조합의 8글자 이상의 문자열입니다."  required/>
+                <input type="password" name="password" id="password" placeholder="영어,숫자,특수문자 조합의 8글자 이상의 문자열입니다."  
+                	<c:if test="${empty error.password}">
+                    	value="${joinForm.password}"   
+                	</c:if>
+                required/>
                 <form:errors path="password" cssClass="valid-msg"/>
            </td>
         </tr>
         <tr>
            <td>휴대폰번호 : </td>
            <td>
-                <input id="tell" type="tel" name="tell" placeholder="숫자만 입력하세요" required/>
+                <input id="tell" type="tel" name="tell" placeholder="숫자만 입력하세요" 
+                	<c:if test="${empty error.tell}">
+                    	value="${joinForm.tell}"   
+                	</c:if>
+                required/>
                 <form:errors path="tell" cssClass="valid-msg"/>
            </td>
         </tr>
@@ -81,7 +96,7 @@ input[type=submit]{
    </table>
    </form:form>
    
-<!-- <script type="text/javascript" src = "/resources/js/member/joinForm.js"></script> -->
+<script type="text/javascript" src = "/resources/js/member/joinForm.js"></script>
    
 
 </body>

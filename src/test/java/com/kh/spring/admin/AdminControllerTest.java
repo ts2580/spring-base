@@ -23,6 +23,8 @@ public class AdminControllerTest {
 
 	@Autowired
 	WebApplicationContext wac;
+	
+	@Autowired
 	MockMvc mockMvc;
 	
 	@Before

@@ -24,6 +24,15 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<interceptors>
+		<interceptor>
+			<mapping path="/**"/>
+			<beans:bean class="com.kh.spring.common.interceptor.Authinterceptor"></beans:bean>
+		</interceptor>
+	</interceptors>
+	<!-- interceptor는 request, response 서블릿 관련이니 여기에-->
+	
+	
 	<context:component-scan base-package="com.kh.spring" />
 	
 	

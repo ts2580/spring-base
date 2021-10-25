@@ -4,14 +4,28 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/include/head.jsp" %>
+<style type="text/css">
+	.title{
+		display: block;
+		width: 150px;
+	}
+	.valid_msg{
+		color:red;
+		font-size: 0.5vw;
+	}
+</style>
 </head>
 <body>
 	
 	<h1 style="text-align: center;">PCLASS TOY PROJECT</h1>
 	
+	<c:if test="${not empty message}">
+			<span class="valid_msg">${message}</span>
+	</c:if>
+	
 	<c:if test="${empty authentication}">
 		<h2><a href="/member/login">login</a></h2>
-		<h2><a href="/member/join-form">회원가입</a></h2>
+		<h2><a href="/member/join">회원가입</a></h2>
 		
 	</c:if>
 	

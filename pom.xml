@@ -148,6 +148,18 @@
     		<version>5.3.10</version>
 		</dependency>
 		
+		<!-- 파일 IO -->
+		<dependency>
+    		<groupId>commons-io</groupId>
+    		<artifactId>commons-io</artifactId>
+    		<version>2.11.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.4</version>
+		</dependency>
 				
 		<!-- Servlet -->
 		<dependency>
@@ -168,6 +180,29 @@
 			<version>1.2</version>
 		</dependency>
 
+		<!-- 이메일 -->
+		<dependency>
+    		<groupId>com.sun.mail</groupId>
+    		<artifactId>javax.mail</artifactId>
+    		<version>1.6.2</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto -->
+		<dependency>
+   			<groupId>org.springframework.security</groupId>
+    		<artifactId>spring-security-crypto</artifactId>
+    		<version>5.5.2</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+    		<groupId>org.projectlombok</groupId>
+    		<artifactId>lombok</artifactId>
+    		<version>1.18.20</version>
+    		<scope>provided</scope>
+		</dependency>
+		
+		
 		
 	
 		<!-- Test -->

@@ -32,6 +32,7 @@ public class JoinFormValidator implements Validator{
 		JoinForm form = (JoinForm)target;
 		
 		// 요청 파라미터가 JoinForm에 바인딩
+		// 만들어진 타겟의 타입정보(JoinForm이니까 Objrct)를 매개변수에
 		// 그게 컨트롤러로 가기 전에 여기 validator를 탐
 		// 즉, 검증 시점을 설정 
 		

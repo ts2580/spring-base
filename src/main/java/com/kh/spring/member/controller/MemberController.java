@@ -1,23 +1,32 @@
 package com.kh.spring.member.controller;
 
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.CookieGenerator;
 
+import com.kh.spring.common.code.ErrorCode;
+import com.kh.spring.common.exception.HandleableException;
+import com.kh.spring.common.validator.ValidateResult;
 import com.kh.spring.member.model.dto.Member;
 import com.kh.spring.member.model.service.MemberService;
 import com.kh.spring.member.validator.JoinForm;
@@ -69,17 +78,29 @@ public class MemberController {
 		this.joinFormValidator = joinFormValidator;
 	}
 	
+	// Model 속성명 자동 생성 규칙
+	// com.myapp.Product becomes "product"
+	// com.myapp.MyProduct becomes "myProduct"
+	// com.myapp.UKProduct becomes "UKProduct"
+
+	
 	@InitBinder(value = "joinForm")
 	public void initBinder(WebDataBinder webDataBinder){
 		// 넘어오는 요청 파라미터를 바인드해주는 메서드
+		// model의 속성 중 속성명이 joinForm인 속성이 있는경우 @InitBinder 실행
+		// 컨트롤러로 넘어오는 데이터의 속성명이 이닛 바인더의 value값과 일치할 때! 
 		webDataBinder.addValidators(joinFormValidator);
-		// 하지만 그 전에 validator 돌릴꺼얌
+		// joinForm으로 파라미터 넘어오면 validator 돌릴꺼얌
 		
 	}
 	
 
-	@GetMapping("join-form")
-	public void joinForm() {}
+	@GetMapping("join")
+	public void joinForm(Model model) {
+		model.addAttribute(new JoinForm()).addAttribute("error", new ValidateResult().getError());
+	}
+	// 매개변수에 모델객체 필요없긴 한데
+	// 나중에 타임리프 쓸려면 필요.
 	
 	// @PostMapping("/member/join") 
 	// public String join(String userId, String password, String tell, String email){
@@ -88,19 +109,47 @@ public class MemberController {
 	
 	// 페이지의 요청 파라미터명과 dto의 변수명이랑 통일! 같아야 바인딩됨!
 	@PostMapping("join")
-	public String join(@Validated JoinForm form, Errors errors){
+	public String join(@Validated JoinForm form, Errors errors, Model model, HttpSession session, RedirectAttributes redirectAttr){
 		// 반드시 검증될(Validator 탈)타입명 바로 뒤에 Error 선언해야함
 		
-		if (errors.hasErrors()) {
-			return "member/join-form";
-		}
+		ValidateResult vr = new ValidateResult();
+		model.addAttribute("error", vr.getError());
 		
+		if (errors.hasErrors()) {
+			vr.addError(errors);
+			return "member/join";
+		}
 		// joinTest 썌릴떄(값 이상한거 넣고)
 		// ModelAndView에 errors뜨면 성공
 		
-		memberService.insertMember(form);
-		return "index";
+		
+		String token = UUID.randomUUID().toString();
+		
+		session.setAttribute("persistUser", form);
+		session.setAttribute("persistToken", token);
+		
+		memberService.authenticateByEmail(form, token);
+		redirectAttr.addFlashAttribute("message", "이메일이 발송되었습니다");
+		
+		return "redirect:/";
 	}
+	
+	@GetMapping("join-impl/{token}")
+	public String joinImpl(@PathVariable String token, @SessionAttribute(value = "persistToken", required = false) String persistToken, 
+			@SessionAttribute(value = "persistUser", required = false) JoinForm form, HttpSession session, RedirectAttributes redirectAttr){
+		// {token}값이 매개변수의 token으로 날라옴
+		
+		if (!token.equals(persistToken)) {
+			throw new HandleableException(ErrorCode.AUTHENTICATION_FAILED_ERROR);
+		}
+		
+		memberService.insertMember(form);
+		redirectAttr.addFlashAttribute("message", "회원가입을 환영합니다");
+		session.removeAttribute("persistToken");
+		session.removeAttribute("persistUser");
+		return "redirect:/member/login";
+	}
+	
 	
 	// json 받아오기 실습용 메서드
 	@PostMapping("join-json")
@@ -116,9 +165,18 @@ public class MemberController {
 	// 로그인 실행 메서드 loginImpl, 재지정 jsp : mypage
 	/* @RequestMapping("/login") 애는 get이랑 post랑 둘 다 가져감. 우리가 필요한건 post 하나니까 PostMapping 쓰자*/
 	@PostMapping("/login")
-	public String loginImpl(Member member, HttpSession session){
+	public String loginImpl(Member member, HttpSession session, RedirectAttributes redirectAttr){
 		
 		Member certifiedUser = memberService.authrnticationUser(member);
+		
+		if (certifiedUser == null) {
+			redirectAttr.addFlashAttribute("message", "아이디나 비밀번호가 정확하지 않습니다");
+			// addFlashAttribute : 딱 그 리다이렉트떄만 값 유지
+			// addAttribute : 마치 세션처럼 값 유지
+			return "redirect:/member/login";
+		}
+		
+		
 		session.setAttribute("authentication", certifiedUser);
 		logger.debug(certifiedUser.toString());
 		//DEBUG에는 내가 넣은값
@@ -130,7 +188,7 @@ public class MemberController {
 	}
 	
 	@GetMapping("mypage")
-	public String mypage(@CookieValue(name="JSESSIONID") String sessionId, @SessionAttribute(name = "authentication") Member member, HttpServletResponse response){
+	public String mypage(@CookieValue(name="JSESSIONID", required = false) String sessionId, @SessionAttribute(name = "authentication", required = false) Member member, HttpServletResponse response){
 		
 		// Cookie 생성 및 응답헤더에 추가
 		CookieGenerator cookieGenerator = new CookieGenerator();
@@ -150,7 +208,7 @@ public class MemberController {
 		Member member = memberService.selectMemberByUserId(userId);
 		
 		if (member == null) {
-			return "avilable";
+			return "available";
 		} else {
 			return "disable";	
 		}

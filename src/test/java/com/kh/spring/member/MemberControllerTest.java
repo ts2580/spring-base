@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -37,7 +38,12 @@ public class MemberControllerTest {
 	
 	@Autowired
 	WebApplicationContext wac;
+	
+	@Autowired
 	MockMvc mockMvc;
+	
+	@Autowired
+	JavaMailSenderImpl mailSender;
 	
 	@Before
 	public void setUp() {
@@ -47,7 +53,7 @@ public class MemberControllerTest {
 	@Test
 	public void joinTest() throws Exception {
 	// view 페이지로 타고들어가니 리포지토리나 mapper 안써도 댐.
-		mockMvc.perform(post("/member/join").param("userId", "SungJin")
+		mockMvc.perform(post("/member/join").param("userId", "SungJin5")
 				.param("password", "1234")
 				.param("tell", "0000111122")
 				.param("email", "aa@bb.cc"))
@@ -119,6 +125,7 @@ public class MemberControllerTest {
 	// 컨트롤러에서 return을 Member로 잡으면 body에 Member 정보가 json으로 담겨져서 날라옴. 굳
 	// 나중에 만일을 위해(한글을 쓸때? charset=ISO-8859-1을 UTF-8로)
 	}
+	
 	
 	
 	

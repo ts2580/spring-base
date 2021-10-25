@@ -9,7 +9,7 @@
 		display: block;
 		width: 150px;
 	}
-	.valid_info{
+	.valid_msg{
 		color:red;
 		font-size: 0.5vw;
 	}
@@ -21,8 +21,8 @@
 	<hr>
 	<form action="/member/login" method="post">
 	
-		<c:if test="${not empty param.err}">
-			<span class="valid_info">아이디와 비밀번호를 확인해주세요</span>
+		<c:if test="${not empty message}">
+			<span class="valid_msg">${message}</span>
 		</c:if>
 		
 		<span class="title">ID : </span>

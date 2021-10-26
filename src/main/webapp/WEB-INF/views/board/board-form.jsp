@@ -9,11 +9,11 @@
 <body>
 
 	<div class="content">
-		<h2 class="tit">*게시판</h2>
+		<h2 class="title">*게시판</h2>
 		<div class="desc_board">
 			<form action="${contextPath}/board/upload" method="post" enctype="multipart/form-data">
 				<div>
-					<div class="tit_board">
+					<div class="title_board">
 						제목 : <input type="text" name="title" required="required" /> 
 						파일 : <input type="file" name="files" id="contract_file" multiple />
 					</div>

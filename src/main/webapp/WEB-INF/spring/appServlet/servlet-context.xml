@@ -3,9 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	<!-- 요청과 응담, 쉽게말해 컨트롤러에서 사용되는 bean들. 예를들어, 제이슨 파싱이나 익셉션 핸들러 등등 -->
@@ -17,6 +21,7 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/file/**" location="file:///C:/CODE/upload" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -32,6 +37,53 @@
 	</interceptors>
 	<!-- interceptor는 request, response 서블릿 관련이니 여기에-->
 	
+	
+	<!-- 파일 업로드 관련 트랜잭션 관이 Bean 등록 : DataSourceTransactionManager-->
+	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<beans:constructor-arg name="dataSource" ref="dataSource"></beans:constructor-arg>
+	</beans:bean>
+	<!-- 이제 우리의 파일 업로드 서비스가 하나의 트랜잭션으로 잡힌다. -->
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 트랜젝션 처리에 사용 할 메서드 네임패턴과 트랜잭션 정책. 공통관심사 등록.  -->
+			<!--  
+			isolation : 격리 레벨, 데이터의 작업이 수행되고 있을 떄  해당 데이터를 정리시키는 수준을 나타냄
+				**DEFAULT : 데이터베이스의 격리레벨을 따라감. 국룰. 사실 자동설정이니 굳이 넣을필요 없긴 함. 그리고 select는 dml이 발생 안하니까 굳이 default 더더욱 넣을 필요가 없음
+				**READ_COMMITED : 커밋이 끝난 데이터만 읽기 허용(수정중인 데이터는 금방 변경된 데이터니까)
+				-READ_UNCOMMITED : 커밋이 끝나지 않은 데이터도 읽기 허용. 거의 안씀
+				-REPEATABLE_READ : SELECT문이 사용되는 데이터에 접근 막아 수정 불가능하게 함
+				-SERIALIZABLE :  SELECT문이 사용되는 데이터에 접근 막아 수정 및 입력이 불가능하게 함
+			rollback-for : 어떤 예외가 발생했을때 rollback 시킬지
+			no-rollback-for : 어떤 예외가 발생했을때 rollback 시키지 않을지
+			propagation : 전파속성, 기존 트랜젝션 유무 여부에 따라 새로운 트랜젝션을 생성하는 정책
+				**REQUIRED : 이미 진행중인 트랜잭션이 있으면 해당 트랜잭션에 포함. 아니면 새로운 트랜젝션 생성
+				-REQUIRD_NEW : 항상 새로운 트랜잭션 생성. 정신나감
+				-MANDATORY : 이미 진행중인 트랜잭션이 있어야만 작업 수행. 없으면 예외 발생
+				-NAVER : 진행중인 트랜잭션이 없어야만 작업 수행. 있으면 예외처리
+				-NESTED : 진행중인 트랜잭션이 있으면 중첩된 트랜잭션 실행한다. 이게 뭔말이야. 
+				-SUPPORTS : 진행중인 트랜잭션이 있으면 트랜잭션에 포함. 없으면 트랜잭션 생성 안함
+			read-only : 읽기전용. DML이 발생하면 ERROR뱉음
+			timeout : 작업을 수행하는데 정해진 시간을 넘기면 rollback
+			-->
+			<tx:method name="select*" read-only="true" />
+			<tx:method name="insert*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="delete*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="update*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Exception"/>
+			<!-- select* : select로 시작하는 모든 메서드 -->
+			<!-- rollback-for="Exception" : 오류나는거 다 롤백 -->
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- Advice를 pointcut이랑 합쳐서 어드바이저로 만들자. 일단 네임스페이스에서 aop 체크 -->
+	
+	<aop:config><!--모든 리턴타입의 메서드 근데 스프링 패키지에 있는 근데 하위에 있는(..) 모든 클래스(*) 중 ServiceImpl 이름 클래스의 ....  -->
+		<aop:pointcut expression="execution(* com.kh.spring..*.*ServiceImpl.*(..))" id="txPointCut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+	</aop:config>
+	
+	
+	<tx:annotation-driven/>
 	
 	<context:component-scan base-package="com.kh.spring" />
 	

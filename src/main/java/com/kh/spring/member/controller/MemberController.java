@@ -32,6 +32,8 @@ import com.kh.spring.member.model.service.MemberService;
 import com.kh.spring.member.validator.JoinForm;
 import com.kh.spring.member.validator.JoinFormValidator;
 
+import lombok.RequiredArgsConstructor;
+
 // 1. @Controller : 해당 클래스를 applicationContext에 bean으로 등록
 //				  Controller와 관련된 annotation을 상요할 수 있게 해준다.
 
@@ -55,6 +57,7 @@ import com.kh.spring.member.validator.JoinFormValidator;
 //    HttpSetvletRequest, HttpSetvletResponse, HttpSession
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("member")
 public class MemberController {
 	
@@ -69,14 +72,8 @@ public class MemberController {
 	// 어떤 view로 경로를 재지정해줄깡
 	
 
-	private MemberService memberService;
-	private JoinFormValidator joinFormValidator;
-	
-	public MemberController(MemberService memberService, JoinFormValidator joinFormValidator) {
-		super();
-		this.memberService = memberService;
-		this.joinFormValidator = joinFormValidator;
-	}
+	private final MemberService memberService;
+	private final JoinFormValidator joinFormValidator;
 	
 	// Model 속성명 자동 생성 규칙
 	// com.myapp.Product becomes "product"

@@ -20,6 +20,8 @@ public enum ErrorCode {
 	
 	private ErrorCode(String msg, String url) {
 		this.MESSAGE = msg;
+
+
 		this.URL = url;
 }
 }

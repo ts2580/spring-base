@@ -19,7 +19,7 @@ public class FileUtil {
 		try {
 			String uploadPath = createUploadPath(createSubPath());
 			fileDto = createFileDTO(file);
-			File dest = new File(uploadPath+fileDto.getOriginFileName());
+			File dest = new File(uploadPath+fileDto.getRenameFileName());
 			file.transferTo(dest);
 		} catch (IllegalStateException | IOException e) {
 			throw new HandleableException(ErrorCode.FAILED_FILE_UPLOAD, e);
@@ -36,7 +36,7 @@ public class FileUtil {
 		int month = cal.get(Calendar.MONTH) + 1;
 		int date = cal.get(Calendar.DAY_OF_MONTH);
 
-		String subPath = year + "\\" + month + "\\" + date + "\\";
+		String subPath = year + "/" + month + "/" + date + "/";
 
 		return subPath;
 	}

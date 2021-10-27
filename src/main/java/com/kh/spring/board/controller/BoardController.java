@@ -38,10 +38,6 @@ public class BoardController {
 	public String uploadBoard(Board board, @RequestParam List<MultipartFile> files, @SessionAttribute("authentication") Member member) {
 		// 스프링에서 파일 올릴떈 List로 받는다. 타입은 MultipartFile. 얼마나 편한지는 한번 써보자. 여기에 파일을 챱챱챱 넣어줌
 		
-		logger.debug("파일 사이즈 : ", files.size());
-		logger.debug("파일 0인덱스 : ", files.get(0));
-		logger.debug("f.isEmpty : ", files.get(0).isEmpty());
-		
 		board.setUserId(member.getUserId());
 		boardService.insertBoard(files, board);
 		

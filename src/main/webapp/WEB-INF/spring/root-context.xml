@@ -10,9 +10,9 @@
 	<!-- 서비스와 다오 관련! -->
 	
 	<bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource">
-		<property name="user" value="bm"></property>
-		<property name="password" value="1234"></property>
-		<property name="URL" value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+		<property name="user" value="admin"></property>
+		<property name="password" value="4921904tR!!!"></property>
+		<property name="URL" value="jdbc:oracle:thin:@db202109131358_high?TNS_ADMIN=C:/CODE/d_front/e_servlet/Wallet_DB202109131358"></property>
 	</bean>
 	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

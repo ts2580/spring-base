@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +26,19 @@ public class BaseballBatch {
 	
 	
 	
-	// 
+	// cron 표현식
+	// 초 분 시 일 월 요일 년(스프링에선 사용 안함)
+	// * : 모든
+	// , : 복수값 지정
+	// 시작시간/단위 : 시작시간부터 저정한 단위마다 실행
+	
+	// 0 0 3 * * * => 0초 0분 3시 매일 매월 매요일
+	// 0 0 3,6,22 * * * => 매일 매월 매요일 새벽 3,4시 저녘 10시에 돌려
+	// 0 0/15 * * * * => 15분마다 배치 실행
+	
+	// 0 46/15 * * * * => 46분 이후 2분마다 배치 실행
+	
+	/* @Scheduled(cron = "0 46/2 * * * *") */
 	public void jsupTest(){
 		
 		Document doc;

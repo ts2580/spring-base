@@ -16,7 +16,7 @@
 	
 	<repositories>
 		<repository>
-			<id>Ojdbc6</id>
+			<id>Ojdbc8</id>
 			<url>http://www.datanucleus.org/downloads/maven2/</url>
 		</repository>
 	</repositories>
@@ -45,6 +45,33 @@
     		<artifactId>spring-context-support</artifactId>
     		<version>5.3.10</version>
 		</dependency>
+		
+		<!--오라클 데이터소스 -->
+		<dependency>
+       		<groupId>com.oracle.database.jdbc</groupId>
+       		<artifactId>ojdbc8</artifactId>
+       		<version>19.8.0.0</version>
+   		</dependency>
+   		<dependency>
+       		<groupId>com.oracle.database.jdbc</groupId>
+       		<artifactId>ucp</artifactId>
+       		<version>19.8.0.0</version>
+  	 	</dependency>
+   		<dependency>
+       		<groupId>com.oracle.database.security</groupId>
+       		<artifactId>oraclepki</artifactId>
+       		<version>19.8.0.0</version>
+   		</dependency>
+   		<dependency>
+       		<groupId>com.oracle.database.security</groupId>
+       		<artifactId>osdt_cert</artifactId>
+       		<version>19.8.0.0</version>
+   		</dependency>
+   		<dependency>
+       		<groupId>com.oracle.database.security</groupId>
+       		<artifactId>osdt_core</artifactId>
+       		<version>19.8.0.0</version>
+   		</dependency>
 				
 		<!-- AspectJ -->
 		<dependency>
@@ -109,11 +136,6 @@
 			<version>1</version>
 		</dependency>
 		
-		<dependency>
-    		<groupId>oracle</groupId>
-    		<artifactId>ojdbc6</artifactId>
-   		 	<version>11.2.0.3</version>
-		</dependency>
 		
 		<!-- json parse -->
 		<dependency>

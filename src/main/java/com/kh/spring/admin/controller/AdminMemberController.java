@@ -26,5 +26,5 @@ public class AdminMemberController {
 		List<Member> members = adminMemberService.selectAllMembers();
 		logger.debug(members.toString());
 		model.addAttribute("members", members);
-	}
+	} 
 }
